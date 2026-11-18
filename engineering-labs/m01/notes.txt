@@ -1,0 +1,23 @@
+"Remind users before their tasks are due."
+
+Find Due Tasks.
+Group by User.
+Write a Message.
+Put Everything Together.
+
+ES Module
+
+export function buildReminders(tasks, users, now) {
+  if (!(now instanceof Date)) throw new TypeError('now is not a Date');
+  const { valid } = checkTasks(tasks);
+  const groups = groupByUser(findDueSoon(valid, now));
+  // One Map lookup for each user. Not a search in the whole list.
+  const userById = new Map(users.map((user) => [user.id, user]));
+  const reminders = [];
+  for (const [userId, list] of groups) {
+    const user = userById.get(userId);
+    const text = formatReminder(user, list, now);
+    reminders.push({ userId, to: user.email, text });
+  }
+  return reminders;
+}
